@@ -23,4 +23,16 @@ public class MainActivity extends AppCompatActivity {
     public void updateProgress(View view) {
         mPlayButtonView.setProgress(Float.valueOf(mEditText.getText().toString()), true);
     }
+
+    public void toggleState(View view) {
+        int buttonState = mPlayButtonView.getButtonState();
+        switch (buttonState) {
+            case PlayButtonView.STATE_PLAY:
+                mPlayButtonView.setButtonState(PlayButtonView.STATE_PAUSE, true);
+                break;
+            case PlayButtonView.STATE_PAUSE:
+                mPlayButtonView.setButtonState(PlayButtonView.STATE_PLAY, true);
+                break;
+        }
+    }
 }

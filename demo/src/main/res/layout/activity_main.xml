@@ -21,19 +21,27 @@
         app:progressColor="@color/colorPrimary"
         app:progressWidth="12dp" />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/progress"
+        android:onClick="toggleState"
+        android:text="Toggle" />
+
     <EditText
         android:id="@+id/progress"
         android:layout_width="180dp"
-        android:inputType="numberSigned"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true" />
+        android:layout_alignParentBottom="true"
+        android:inputType="numberSigned" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_toRightOf="@+id/progress"
         android:layout_toEndOf="@+id/progress"
+        android:layout_toRightOf="@+id/progress"
         android:onClick="updateProgress"
         android:text="Update" />
+
 </RelativeLayout>

@@ -1,5 +1,8 @@
 package com.manijshrestha.progressplaybutton;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -28,6 +31,9 @@ import java.lang.annotation.RetentionPolicy;
 public class PlayButtonView extends View {
 
     private static final int DEFAULT_ANIMATION_DURATION = 300;
+    private static final int DEFAULT_FAST_ANIMATION_DURATION = 200;
+    private static final int ALPHA_INVISIBLE = 0;
+    private static final int ALPHA_VISIBLE = 255;
 
     private Paint mProgressPaint;
     private float mStrokeSize;
@@ -56,6 +62,8 @@ public class PlayButtonView extends View {
     // Player Button Drawables
     private Drawable mPlayDrawable;
     private Drawable mPauseDrawable;
+    private int mPlayButtonAlpha, mPauseButtonAlpha; // value between 0...255
+    private boolean mIsButtonAnimating;
     //endregion
 
     @Retention(RetentionPolicy.SOURCE)
@@ -63,8 +71,8 @@ public class PlayButtonView extends View {
     @interface PlayButtonState {
     }
 
-    private static final int STATE_PLAY = 0;
-    private static final int STATE_PAUSE = 1;
+    public static final int STATE_PLAY = 0;
+    public static final int STATE_PAUSE = 1;
 
     public PlayButtonView(Context context) {
         super(context);
@@ -132,12 +140,22 @@ public class PlayButtonView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         canvas.drawArc(mProgressRect, -90, getSweepAngle(mProgress), false, mProgressPaint);
-        if (mButtonState == STATE_PLAY)
+        // if not animating draw only one state otherwise draw both buttons
+        if (!mIsButtonAnimating) {
+            if (mButtonState == STATE_PLAY)
+                mPlayDrawable.draw(canvas);
+            else
+                mPauseDrawable.draw(canvas);
+        } else {
+            mPlayDrawable.setAlpha(mPlayButtonAlpha);
+            mPauseDrawable.setAlpha(mPauseButtonAlpha);
             mPlayDrawable.draw(canvas);
-        else
             mPauseDrawable.draw(canvas);
+        }
+        canvas.save();
     }
 
+    //region Progress State
     public void setProgress(@FloatRange(from = 0, to = 100) float progress, boolean animate) {
         if (animate) {
             ObjectAnimator progressInternal = ObjectAnimator.ofFloat(this, "ProgressInternal", mProgress, progress);
@@ -148,14 +166,71 @@ public class PlayButtonView extends View {
         }
     }
 
-    public void setButtonState(@PlayButtonState int state, boolean animate) {
-        mButtonState = state;
-    }
-
     private void setProgressInternal(float progressInternal) {
         mProgress = progressInternal;
         invalidate();
     }
+    //endregion
+
+    //region Button States
+    @PlayButtonState
+    public int getButtonState() {
+        return mButtonState;
+    }
+
+    public void setButtonState(@PlayButtonState final int state, boolean animate) {
+        if (mIsButtonAnimating)
+            return;
+
+        if (animate) {
+            mIsButtonAnimating = true;
+            String appearingButton, disAppearingButton;
+            if (state == STATE_PLAY) {
+                appearingButton = "PlayButtonAlpha";
+                disAppearingButton = "PauseButtonAlpha";
+            } else {
+                appearingButton = "PauseButtonAlpha";
+                disAppearingButton = "PlayButtonAlpha";
+            }
+
+            ObjectAnimator appearAnimation = ObjectAnimator.ofInt(this, appearingButton, ALPHA_INVISIBLE, ALPHA_VISIBLE)
+                    .setDuration(DEFAULT_FAST_ANIMATION_DURATION);
+            ObjectAnimator disAppearAnimation = ObjectAnimator.ofInt(this, disAppearingButton, ALPHA_VISIBLE, ALPHA_INVISIBLE)
+                    .setDuration(DEFAULT_FAST_ANIMATION_DURATION);
+
+            AnimatorSet animatorSet = new AnimatorSet();
+            animatorSet.play(appearAnimation)
+                    .with(disAppearAnimation);
+
+            animatorSet.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mIsButtonAnimating = false;
+                    setButtonStateInternal(state);
+                }
+            });
+
+            animatorSet.start();
+        } else {
+            setButtonStateInternal(state);
+        }
+    }
+
+    private synchronized void setPlayButtonAlpha(int alpha) {
+        mPlayButtonAlpha = alpha;
+        invalidate();
+    }
+
+    private synchronized void setPauseButtonAlpha(int alpha) {
+        mPauseButtonAlpha = alpha;
+        invalidate();
+    }
+
+    private void setButtonStateInternal(@PlayButtonState int state) {
+        mButtonState = state;
+        invalidate();
+    }
+    //endregion
 
     @Override
     protected Parcelable onSaveInstanceState() {
