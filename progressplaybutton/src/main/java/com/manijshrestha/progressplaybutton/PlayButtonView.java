@@ -11,6 +11,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
+import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.ColorInt;
 import android.support.annotation.FloatRange;
@@ -234,12 +235,24 @@ public class PlayButtonView extends View {
 
     @Override
     protected Parcelable onSaveInstanceState() {
-        return super.onSaveInstanceState();
+        Parcelable superState = super.onSaveInstanceState();
+        SavedState savedState = new SavedState(superState);
+        savedState.buttonState = mButtonState;
+        savedState.progress = mProgress;
+        return savedState;
     }
 
     @Override
     protected void onRestoreInstanceState(Parcelable state) {
-        super.onRestoreInstanceState(state);
+        if (!(state instanceof SavedState)) {
+            super.onRestoreInstanceState(state);
+            return;
+        }
+
+        SavedState savedState = (SavedState) state;
+        mButtonState = savedState.buttonState;
+        mProgress = savedState.progress;
+        super.onRestoreInstanceState(savedState.getSuperState());
     }
 
     /**
@@ -251,5 +264,48 @@ public class PlayButtonView extends View {
      */
     private float getSweepAngle(@FloatRange(from = 0, to = 100) float progress) {
         return progress * 3.6f;
+    }
+
+    public static class SavedState extends BaseSavedState implements Parcelable {
+
+        @PlayButtonState
+        private int buttonState;
+
+        private float progress;
+
+        public SavedState(Parcelable superState) {
+            super(superState);
+        }
+
+        protected SavedState(Parcel in) {
+            super(in);
+            //noinspection WrongConstant
+            buttonState = in.readInt();
+            progress = in.readFloat();
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            super.writeToParcel(dest, flags);
+            dest.writeInt(buttonState);
+            dest.writeFloat(progress);
+        }
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        public static final Creator<SavedState> CREATOR = new Creator<SavedState>() {
+            @Override
+            public SavedState createFromParcel(Parcel in) {
+                return new SavedState(in);
+            }
+
+            @Override
+            public SavedState[] newArray(int size) {
+                return new SavedState[size];
+            }
+        };
     }
 }
