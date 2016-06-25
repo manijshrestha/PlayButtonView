@@ -15,7 +15,8 @@
         android:layout_width="300dp"
         android:layout_height="300dp"
         android:layout_centerHorizontal="true"
-        android:background="#252525"
+        app:pauseButtonTint="@color/colorPrimaryDark"
+        app:playButtonTint="@color/colorPrimary"
         app:progress="33"
         app:progressColor="@color/colorPrimary"
         app:progressWidth="12dp" />
@@ -23,6 +24,7 @@
     <EditText
         android:id="@+id/progress"
         android:layout_width="180dp"
+        android:inputType="numberSigned"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true" />
 
@@ -31,6 +33,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_toRightOf="@+id/progress"
+        android:layout_toEndOf="@+id/progress"
         android:onClick="updateProgress"
         android:text="Update" />
 </RelativeLayout>

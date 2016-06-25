@@ -12,6 +12,7 @@ import android.os.Parcelable;
 import android.support.annotation.ColorInt;
 import android.support.annotation.FloatRange;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -30,7 +31,7 @@ public class PlayButtonView extends View {
     //region Settable Properties
     // Color of the progress bar
     @ColorInt
-    private int mProgressColor;
+    private int mProgressColor, mPlayButtonTint, mPauseButtonTint;
 
     // Width of the progress bar
     private float mProgressWidthDP;
@@ -60,7 +61,9 @@ public class PlayButtonView extends View {
         try {
             mProgressWidthDP = typedArray.getDimension(R.styleable.PlayButtonView_progressWidth, 8);
             mProgress = typedArray.getFloat(R.styleable.PlayButtonView_progress, 0);
-            mProgressColor = typedArray.getColor(R.styleable.PlayButtonView_progressColor, ContextCompat.getColor(context, android.R.color.holo_blue_dark));
+            mProgressColor = typedArray.getColor(R.styleable.PlayButtonView_progressColor, ContextCompat.getColor(context, android.R.color.black));
+            mPlayButtonTint = typedArray.getColor(R.styleable.PlayButtonView_playButtonTint, ContextCompat.getColor(context, android.R.color.black));
+            mPauseButtonTint = typedArray.getColor(R.styleable.PlayButtonView_pauseButtonTint, ContextCompat.getColor(context, android.R.color.black));
         } finally {
             typedArray.recycle();
         }
@@ -87,8 +90,10 @@ public class PlayButtonView extends View {
         mProgressPaint.setStrokeJoin(Paint.Join.ROUND);
         mProgressRect = new RectF();
         mButtonStateRect = new Rect();
-        mPlayDrawable = ContextCompat.getDrawable(getContext(), R.drawable.ic_play_arrow);
-        mPauseDrawable = ContextCompat.getDrawable(getContext(), R.drawable.ic_pause);
+        mPlayDrawable = DrawableCompat.wrap(ContextCompat.getDrawable(getContext(), R.drawable.ic_play_arrow));
+        DrawableCompat.setTint(mPlayDrawable, mPlayButtonTint);
+        mPauseDrawable = DrawableCompat.wrap(ContextCompat.getDrawable(getContext(), R.drawable.ic_pause));
+        DrawableCompat.setTint(mPauseDrawable, mPauseButtonTint);
     }
 
     @Override

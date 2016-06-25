@@ -4,5 +4,7 @@
         <attr name="progress" format="float" />
         <attr name="progressWidth" format="dimension" />
         <attr name="progressColor" format="color" />
+        <attr name="playButtonTint" format="color" />
+        <attr name="pauseButtonTint" format="color" />
     </declare-styleable>
 </resources>
