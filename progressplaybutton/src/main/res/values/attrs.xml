@@ -6,5 +6,9 @@
         <attr name="progressColor" format="color" />
         <attr name="playButtonTint" format="color" />
         <attr name="pauseButtonTint" format="color" />
+        <attr name="buttonState">
+            <flag name="play" value="0" />
+            <flag name="pause" value="1" />
+        </attr>
     </declare-styleable>
 </resources>

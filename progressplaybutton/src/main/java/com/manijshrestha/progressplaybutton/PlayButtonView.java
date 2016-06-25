@@ -11,10 +11,14 @@ import android.graphics.drawable.Drawable;
 import android.os.Parcelable;
 import android.support.annotation.ColorInt;
 import android.support.annotation.FloatRange;
+import android.support.annotation.IntDef;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.util.AttributeSet;
 import android.view.View;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 /**
  * Play Button View with custom circular progress
@@ -36,6 +40,10 @@ public class PlayButtonView extends View {
     // Width of the progress bar
     private float mProgressWidthDP;
 
+    // Button State
+    @PlayButtonState
+    private int mButtonState;
+
     // Progress
     @FloatRange(from = 0, to = 100)
     private float mProgress;
@@ -49,6 +57,14 @@ public class PlayButtonView extends View {
     private Drawable mPlayDrawable;
     private Drawable mPauseDrawable;
     //endregion
+
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef({STATE_PLAY, STATE_PAUSE})
+    @interface PlayButtonState {
+    }
+
+    private static final int STATE_PLAY = 0;
+    private static final int STATE_PAUSE = 1;
 
     public PlayButtonView(Context context) {
         super(context);
@@ -64,6 +80,8 @@ public class PlayButtonView extends View {
             mProgressColor = typedArray.getColor(R.styleable.PlayButtonView_progressColor, ContextCompat.getColor(context, android.R.color.black));
             mPlayButtonTint = typedArray.getColor(R.styleable.PlayButtonView_playButtonTint, ContextCompat.getColor(context, android.R.color.black));
             mPauseButtonTint = typedArray.getColor(R.styleable.PlayButtonView_pauseButtonTint, ContextCompat.getColor(context, android.R.color.black));
+            //noinspection WrongConstant
+            mButtonState = typedArray.getInt(R.styleable.PlayButtonView_buttonState, STATE_PLAY);
         } finally {
             typedArray.recycle();
         }
@@ -114,7 +132,10 @@ public class PlayButtonView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         canvas.drawArc(mProgressRect, -90, getSweepAngle(mProgress), false, mProgressPaint);
-        mPlayDrawable.draw(canvas);
+        if (mButtonState == STATE_PLAY)
+            mPlayDrawable.draw(canvas);
+        else
+            mPauseDrawable.draw(canvas);
     }
 
     public void setProgress(@FloatRange(from = 0, to = 100) float progress, boolean animate) {
@@ -125,6 +146,10 @@ public class PlayButtonView extends View {
         } else {
             setProgressInternal(progress);
         }
+    }
+
+    public void setButtonState(@PlayButtonState int state, boolean animate) {
+        mButtonState = state;
     }
 
     private void setProgressInternal(float progressInternal) {
