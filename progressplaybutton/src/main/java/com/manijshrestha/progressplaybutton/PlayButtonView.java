@@ -143,10 +143,13 @@ public class PlayButtonView extends View {
         canvas.drawArc(mProgressRect, -90, getSweepAngle(mProgress), false, mProgressPaint);
         // if not animating draw only one state otherwise draw both buttons
         if (!mIsButtonAnimating) {
-            if (mButtonState == STATE_PLAY)
+            if (mButtonState == STATE_PLAY) {
+                mPlayDrawable.setAlpha(ALPHA_VISIBLE);
                 mPlayDrawable.draw(canvas);
-            else
+            } else {
+                mPauseDrawable.setAlpha(ALPHA_VISIBLE);
                 mPauseDrawable.draw(canvas);
+            }
         } else {
             mPlayDrawable.setAlpha(mPlayButtonAlpha);
             mPauseDrawable.setAlpha(mPauseButtonAlpha);
@@ -204,6 +207,13 @@ public class PlayButtonView extends View {
                     .with(disAppearAnimation);
 
             animatorSet.addListener(new AnimatorListenerAdapter() {
+
+                @Override
+                public void onAnimationCancel(Animator animation) {
+                    mIsButtonAnimating = false;
+                    setButtonStateInternal(state);
+                }
+
                 @Override
                 public void onAnimationEnd(Animator animation) {
                     mIsButtonAnimating = false;
