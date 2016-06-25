@@ -44,8 +44,9 @@ public class PlayButtonView extends View {
 
     private Rect mButtonStateRect;
 
-    // Play Drawable
+    // Player Button Drawables
     private Drawable mPlayDrawable;
+    private Drawable mPauseDrawable;
     //endregion
 
     public PlayButtonView(Context context) {
@@ -87,6 +88,7 @@ public class PlayButtonView extends View {
         mProgressRect = new RectF();
         mButtonStateRect = new Rect();
         mPlayDrawable = ContextCompat.getDrawable(getContext(), R.drawable.ic_play_arrow);
+        mPauseDrawable = ContextCompat.getDrawable(getContext(), R.drawable.ic_pause);
     }
 
     @Override
@@ -100,6 +102,7 @@ public class PlayButtonView extends View {
         mProgressRect.set(mStrokeSize, mStrokeSize, mProgressViewSize, mProgressViewSize);
         mProgressRect.roundOut(mButtonStateRect);
         mPlayDrawable.setBounds(mButtonStateRect);
+        mPauseDrawable.setBounds(mButtonStateRect);
         setMeasuredDimension(targetWidthHeight, targetWidthHeight);
     }
 
