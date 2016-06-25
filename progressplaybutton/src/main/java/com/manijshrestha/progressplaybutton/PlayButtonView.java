@@ -5,7 +5,9 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.drawable.Drawable;
 import android.os.Parcelable;
 import android.support.annotation.ColorInt;
 import android.support.annotation.FloatRange;
@@ -39,6 +41,11 @@ public class PlayButtonView extends View {
 
     // ProgressViewRect
     private RectF mProgressRect;
+
+    private Rect mButtonStateRect;
+
+    // Play Drawable
+    private Drawable mPlayDrawable;
     //endregion
 
     public PlayButtonView(Context context) {
@@ -78,6 +85,8 @@ public class PlayButtonView extends View {
         mProgressPaint.setStrokeCap(Paint.Cap.ROUND);
         mProgressPaint.setStrokeJoin(Paint.Join.ROUND);
         mProgressRect = new RectF();
+        mButtonStateRect = new Rect();
+        mPlayDrawable = ContextCompat.getDrawable(getContext(), R.drawable.ic_play_arrow);
     }
 
     @Override
@@ -89,12 +98,15 @@ public class PlayButtonView extends View {
         int targetWidthHeight = Math.min(width, height);
         float mProgressViewSize = targetWidthHeight - mStrokeSize;
         mProgressRect.set(mStrokeSize, mStrokeSize, mProgressViewSize, mProgressViewSize);
+        mProgressRect.roundOut(mButtonStateRect);
+        mPlayDrawable.setBounds(mButtonStateRect);
         setMeasuredDimension(targetWidthHeight, targetWidthHeight);
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         canvas.drawArc(mProgressRect, -90, getSweepAngle(mProgress), false, mProgressPaint);
+        mPlayDrawable.draw(canvas);
     }
 
     public void setProgress(@FloatRange(from = 0, to = 100) float progress, boolean animate) {
