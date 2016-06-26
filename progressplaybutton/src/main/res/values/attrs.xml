@@ -10,5 +10,7 @@
             <flag name="play" value="0" />
             <flag name="pause" value="1" />
         </attr>
+        <attr name="showProgressTrack" format="boolean" />
+        <attr name="progressTrackColor" format="color" />
     </declare-styleable>
 </resources>

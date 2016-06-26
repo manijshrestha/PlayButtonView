@@ -18,6 +18,12 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         mEditText = (EditText) findViewById(R.id.progress);
         mPlayButtonView = (PlayButtonView) findViewById(R.id.play_button);
+        mPlayButtonView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                toggleState(null);
+            }
+        });
     }
 
     public void updateProgress(View view) {

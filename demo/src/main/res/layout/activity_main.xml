@@ -15,11 +15,14 @@
         android:layout_width="300dp"
         android:layout_height="300dp"
         android:layout_centerHorizontal="true"
+        android:background="?selectableItemBackgroundBorderless"
         app:pauseButtonTint="@color/colorPrimaryDark"
         app:playButtonTint="@color/colorPrimary"
         app:progress="33"
         app:progressColor="@color/colorPrimary"
-        app:progressWidth="12dp" />
+        app:progressTrackColor="#ef5c5d83"
+        app:progressWidth="12dp"
+        app:showProgressTrack="true" />
 
     <Button
         android:layout_width="wrap_content"

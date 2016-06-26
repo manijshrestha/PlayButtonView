@@ -36,13 +36,13 @@ public class PlayButtonView extends View {
     private static final int ALPHA_INVISIBLE = 0;
     private static final int ALPHA_VISIBLE = 255;
 
-    private Paint mProgressPaint;
-    private float mStrokeSize;
+    private Paint mProgressPaint, mProgressTrackPaint;
+    private float mStrokeSize, mProgressTrackStrokeSize;
 
     //region Settable Properties
     // Color of the progress bar
     @ColorInt
-    private int mProgressColor, mPlayButtonTint, mPauseButtonTint;
+    private int mProgressColor, mPlayButtonTint, mPauseButtonTint, mProgressTrackColor;
 
     // Width of the progress bar
     private float mProgressWidthDP;
@@ -54,6 +54,8 @@ public class PlayButtonView extends View {
     // Progress
     @FloatRange(from = 0, to = 100)
     private float mProgress;
+
+    private boolean mShowProgressTrack;
 
     // ProgressViewRect
     private RectF mProgressRect;
@@ -91,6 +93,8 @@ public class PlayButtonView extends View {
             mPauseButtonTint = typedArray.getColor(R.styleable.PlayButtonView_pauseButtonTint, ContextCompat.getColor(context, android.R.color.black));
             //noinspection WrongConstant
             mButtonState = typedArray.getInt(R.styleable.PlayButtonView_buttonState, STATE_PLAY);
+            mShowProgressTrack = typedArray.getBoolean(R.styleable.PlayButtonView_showProgressTrack, false);
+            mProgressTrackColor = typedArray.getColor(R.styleable.PlayButtonView_progressTrackColor, ContextCompat.getColor(context, android.R.color.black));
         } finally {
             typedArray.recycle();
         }
@@ -111,10 +115,21 @@ public class PlayButtonView extends View {
         mProgressPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mProgressPaint.setColor(mProgressColor);
         mProgressPaint.setStyle(Paint.Style.STROKE);
-        mStrokeSize = mProgressWidthDP * getResources().getDisplayMetrics().density;
+
+        float density = getResources().getDisplayMetrics().density;
+
+        mStrokeSize = mProgressWidthDP * density;
+        mProgressTrackStrokeSize = (float) Math.max(density, (mProgressWidthDP * 0.5) * density);
+
         mProgressPaint.setStrokeWidth(mStrokeSize);
         mProgressPaint.setStrokeCap(Paint.Cap.ROUND);
         mProgressPaint.setStrokeJoin(Paint.Join.ROUND);
+
+        mProgressTrackPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mProgressTrackPaint.setColor(mProgressTrackColor);
+        mProgressTrackPaint.setStyle(Paint.Style.STROKE);
+        mProgressTrackPaint.setStrokeWidth(mProgressTrackStrokeSize);
+
         mProgressRect = new RectF();
         mButtonStateRect = new Rect();
         mPlayDrawable = DrawableCompat.wrap(ContextCompat.getDrawable(getContext(), R.drawable.ic_play_arrow));
@@ -140,6 +155,10 @@ public class PlayButtonView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
+        if (mShowProgressTrack) {
+            canvas.drawOval(mProgressRect, mProgressTrackPaint);
+        }
+
         canvas.drawArc(mProgressRect, -90, getSweepAngle(mProgress), false, mProgressPaint);
         // if not animating draw only one state otherwise draw both buttons
         if (!mIsButtonAnimating) {
